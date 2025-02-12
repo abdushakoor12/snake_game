@@ -36,7 +36,43 @@ class SnakeGame {
     }
 
     setupEventListeners() {
+        // Keyboard controls
         document.addEventListener('keydown', this.handleKeyPress.bind(this));
+        
+        // Mobile controls
+        const controls = {
+            'up-btn': { x: 0, y: -1 },
+            'down-btn': { x: 0, y: 1 },
+            'left-btn': { x: -1, y: 0 },
+            'right-btn': { x: 1, y: 0 }
+        };
+
+        Object.entries(controls).forEach(([btnId, direction]) => {
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                // Touch events for mobile
+                btn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    if (this.direction.x !== -direction.x && this.direction.y !== -direction.y) {
+                        this.nextDirection = direction;
+                    }
+                });
+
+                // Mouse events for testing on desktop
+                btn.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    if (this.direction.x !== -direction.x && this.direction.y !== -direction.y) {
+                        this.nextDirection = direction;
+                    }
+                });
+            }
+        });
+
+        // Prevent scrolling when touching the buttons
+        document.querySelectorAll('.control-btn').forEach(btn => {
+            btn.addEventListener('touchmove', (e) => e.preventDefault());
+        });
+
         this.restartButton.addEventListener('click', () => {
             this.modal.classList.remove('show');
             this.startGame();

@@ -1,0 +1,215 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+.game-container {
+    position: relative;
+    padding: 20px;
+}
+
+.score-display {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+#game-grid {
+    display: grid;
+    grid-template-columns: repeat(20, 20px);
+    grid-template-rows: repeat(20, 20px);
+    gap: 1px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.snake-cell {
+    border-radius: 4px;
+    background: linear-gradient(45deg, #00ff88, #00cc6f);
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    animation: snakePulse 2s infinite;
+}
+
+.snake-head {
+    border-radius: 8px;
+    background: linear-gradient(45deg, #00ff9d, #00e07f);
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.7);
+    position: relative;
+}
+
+.snake-head::before,
+.snake-head::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #000;
+    border-radius: 50%;
+    top: 25%;
+    animation: blinkEyes 3s infinite;
+}
+
+.snake-head::before {
+    left: 20%;
+}
+
+.snake-head::after {
+    right: 20%;
+}
+
+.snake-head.eating {
+    animation: eating 0.2s ease-in-out;
+    transform-origin: center;
+}
+
+.food-cell {
+    position: relative;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: foodBounce 0.8s infinite alternate ease-in-out;
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
+}
+
+@keyframes foodBounce {
+    from { transform: scale(1) rotate(-5deg); }
+    to { transform: scale(1.1) rotate(5deg); }
+}
+
+/* Different food types with emojis */
+.food-basic::after {
+    content: '🍎';
+}
+
+.food-banana::after {
+    content: '🍌';
+}
+
+.food-orange::after {
+    content: '🍊';
+}
+
+.food-grapes::after {
+    content: '🍇';
+}
+
+.food-watermelon::after {
+    content: '🍉';
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s 0.3s, opacity 0.3s ease;
+}
+
+.modal.show {
+    visibility: visible;
+    opacity: 1;
+    transition: visibility 0s, opacity 0.3s ease;
+}
+
+.modal-content {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+    box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+}
+
+.modal.show .modal-content {
+    transform: scale(1);
+}
+
+.modal h2 {
+    margin-bottom: 20px;
+    color: #00ff88;
+    font-size: 28px;
+}
+
+#restart-button {
+    margin-top: 20px;
+    padding: 12px 35px;
+    font-size: 18px;
+    background: linear-gradient(45deg, #00ff88, #00cc6f);
+    border: none;
+    border-radius: 25px;
+    color: #1a1a1a;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    font-weight: 600;
+}
+
+#restart-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+}
+
+@keyframes snakePulse {
+    0% {
+        box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(0, 255, 136, 0.7);
+    }
+    100% {
+        box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    }
+}
+
+@keyframes foodGlow {
+    from {
+        background: linear-gradient(45deg, #ff6f61, #ff4757);
+        box-shadow: 0 0 10px rgba(255, 111, 97, 0.5);
+    }
+    to {
+        background: linear-gradient(45deg, #ff4757, #ff6f61);
+        box-shadow: 0 0 20px rgba(255, 111, 97, 0.7);
+    }
+}
+
+@keyframes eating {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.5); }
+    100% { transform: scale(1); }
+}
+
+@keyframes blinkEyes {
+    0%, 96% { opacity: 1; }
+    98% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@media (max-width: 600px) {
+    #game-grid {
+        grid-template-columns: repeat(20, 15px);
+        grid-template-rows: repeat(20, 15px);
+    }
+}

@@ -28,13 +28,14 @@ body {
 
 #game-grid {
     display: grid;
-    grid-template-columns: repeat(20, 20px);
-    grid-template-rows: repeat(20, 20px);
-    gap: 1px;
+    grid-template-columns: repeat(25, 28px);
+    grid-template-rows: repeat(25, 28px);
+    gap: 2px;
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-    padding: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+    margin: 20px auto;
 }
 
 .snake-cell {
@@ -78,7 +79,7 @@ body {
 
 .food-cell {
     position: relative;
-    font-size: 20px;
+    font-size: 24px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -114,7 +115,7 @@ body {
 
 .food-bonus::after {
     content: '🍓';
-    font-size: 24px; /* Slightly larger than regular fruits */
+    font-size: 32px; /* Slightly larger than regular fruits */
 }
 
 .food-bonus {
@@ -243,9 +244,30 @@ body {
     100% { opacity: 1; }
 }
 
+@media (max-width: 800px) {
+    #game-grid {
+        grid-template-columns: repeat(25, 20px);
+        grid-template-rows: repeat(25, 20px);
+    }
+    .food-cell {
+        font-size: 18px;
+    }
+    .food-bonus::after {
+        font-size: 24px;
+    }
+}
+
 @media (max-width: 600px) {
     #game-grid {
-        grid-template-columns: repeat(20, 15px);
-        grid-template-rows: repeat(20, 15px);
+        grid-template-columns: repeat(25, 16px);
+        grid-template-rows: repeat(25, 16px);
+        gap: 1px;
+        padding: 10px;
+    }
+    .food-cell {
+        font-size: 14px;
+    }
+    .food-bonus::after {
+        font-size: 18px;
     }
 }

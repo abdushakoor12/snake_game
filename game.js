@@ -1,6 +1,6 @@
 class SnakeGame {
     constructor() {
-        this.gridSize = 20;
+        this.gridSize = 25;
         this.gameGrid = document.getElementById('game-grid');
         this.scoreDisplay = document.getElementById('score');
         this.finalScoreDisplay = document.getElementById('final-score');
@@ -46,9 +46,9 @@ class SnakeGame {
     startGame() {
         // Initialize game state
         this.snake = [
-            { x: 10, y: 10 },
-            { x: 10, y: 11 },
-            { x: 10, y: 12 }
+            { x: 12, y: 12 },
+            { x: 12, y: 13 },
+            { x: 12, y: 14 }
         ];
         this.direction = { x: 0, y: -1 }; // Moving up initially
         this.nextDirection = { x: 0, y: -1 };
@@ -68,7 +68,7 @@ class SnakeGame {
 
         // Start game loop
         if (this.gameInterval) clearInterval(this.gameInterval);
-        this.gameInterval = setInterval(() => this.gameLoop(), 150);
+        this.gameInterval = setInterval(() => this.gameLoop(), 130);
 
         // Start bonus fruit spawning
         this.scheduleBonusFruit();

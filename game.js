@@ -13,6 +13,13 @@ class SnakeGame {
         
         // Animation state
         this.isEating = false;
+
+        // Bonus fruit state
+        this.bonusFood = null;
+        this.bonusTimeout = null;
+        this.bonusCountdown = null;
+        this.bonusDuration = 7000; // 7 seconds
+        this.bonusInterval = 15000; // Bonus fruit appears every 15 seconds
         
         this.initializeGrid();
         this.setupEventListeners();
@@ -51,12 +58,20 @@ class SnakeGame {
         this.updateScore();
         this.modal.classList.remove('show');
 
+        // Clear bonus state
+        if (this.bonusTimeout) clearTimeout(this.bonusTimeout);
+        if (this.bonusCountdown) clearInterval(this.bonusCountdown);
+        this.bonusFood = null;
+
         // Clear the grid
         this.initializeGrid();
 
         // Start game loop
         if (this.gameInterval) clearInterval(this.gameInterval);
         this.gameInterval = setInterval(() => this.gameLoop(), 150);
+
+        // Start bonus fruit spawning
+        this.scheduleBonusFruit();
     }
 
     generateFood() {
@@ -138,7 +153,7 @@ class SnakeGame {
         // Add new head
         this.snake.unshift(head);
 
-        // Check if food is eaten
+        // Check if regular food is eaten
         if (head.x === this.food.x && head.y === this.food.y) {
             this.score += this.food.points;
             this.updateScore();
@@ -151,6 +166,24 @@ class SnakeGame {
                 const lastSegment = this.snake[this.snake.length - 1];
                 this.snake.push({ ...lastSegment });
             }
+        } 
+        // Check if bonus food is eaten
+        else if (this.bonusFood && head.x === this.bonusFood.x && head.y === this.bonusFood.y) {
+            this.score += this.bonusFood.points;
+            this.updateScore();
+            this.playEatingAnimation(this.bonusFood.points);
+            this.playSound(this.eatingSound);
+            
+            // Grow the snake based on bonus points
+            for (let i = 1; i < this.bonusFood.points; i++) {
+                const lastSegment = this.snake[this.snake.length - 1];
+                this.snake.push({ ...lastSegment });
+            }
+
+            // Clear bonus food
+            this.clearBonusFood();
+            // Schedule next bonus food
+            this.scheduleBonusFruit();
         } else {
             this.snake.pop();
         }
@@ -189,10 +222,28 @@ class SnakeGame {
             }
         });
 
-        // Draw food
+        // Draw regular food
         const foodIndex = this.food.y * this.gridSize + this.food.x;
         if (cells[foodIndex]) {
             cells[foodIndex].classList.add('food-cell', `food-${this.food.type}`);
+        }
+
+        // Draw bonus food if exists
+        if (this.bonusFood) {
+            const bonusFoodIndex = this.bonusFood.y * this.gridSize + this.bonusFood.x;
+            if (cells[bonusFoodIndex]) {
+                cells[bonusFoodIndex].classList.add('food-cell', 'food-bonus');
+                
+                // Update or create countdown display
+                let countdown = cells[bonusFoodIndex].querySelector('.bonus-countdown');
+                if (!countdown) {
+                    countdown = document.createElement('div');
+                    countdown.className = 'bonus-countdown';
+                    cells[bonusFoodIndex].appendChild(countdown);
+                }
+                const timeLeft = Math.ceil((this.bonusFood.endTime - Date.now()) / 1000);
+                countdown.textContent = `${timeLeft}s`;
+            }
         }
     }
 
@@ -204,9 +255,55 @@ class SnakeGame {
     endGame() {
         this.gameOver = true;
         clearInterval(this.gameInterval);
+        if (this.bonusTimeout) clearTimeout(this.bonusTimeout);
+        if (this.bonusCountdown) clearInterval(this.bonusCountdown);
         this.modal.classList.add('show');
         this.finalScoreDisplay.textContent = this.score;
         this.playSound(this.deathSound);
+    }
+
+    generateBonusFood() {
+        let bonusFood;
+        do {
+            bonusFood = {
+                x: Math.floor(Math.random() * this.gridSize),
+                y: Math.floor(Math.random() * this.gridSize),
+                type: 'bonus',
+                points: 15,
+                endTime: Date.now() + this.bonusDuration
+            };
+        } while (
+            this.snake.some(segment => segment.x === bonusFood.x && segment.y === bonusFood.y) ||
+            (this.food.x === bonusFood.x && this.food.y === bonusFood.y)
+        );
+        return bonusFood;
+    }
+
+    clearBonusFood() {
+        this.bonusFood = null;
+        if (this.bonusTimeout) clearTimeout(this.bonusTimeout);
+        if (this.bonusCountdown) clearInterval(this.bonusCountdown);
+    }
+
+    scheduleBonusFruit() {
+        setTimeout(() => {
+            if (!this.gameOver) {
+                this.bonusFood = this.generateBonusFood();
+                
+                // Set timeout to remove the bonus food
+                this.bonusTimeout = setTimeout(() => {
+                    this.clearBonusFood();
+                    this.scheduleBonusFruit(); // Schedule next bonus fruit
+                }, this.bonusDuration);
+
+                // Start countdown update interval
+                this.bonusCountdown = setInterval(() => {
+                    if (this.bonusFood && !this.gameOver) {
+                        this.updateGrid();
+                    }
+                }, 1000);
+            }
+        }, this.bonusInterval);
     }
 
     playSound(audioElement) {
